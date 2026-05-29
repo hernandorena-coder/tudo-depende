@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tudo Depende</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --pink: #D4537E;
+    --pink-light: #FBEAF0;
+    --pink-dark: #72243E;
+    --green: #639922;
+    --green-light: #EAF3DE;
+    --green-dark: #27500A;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --amber-dark: #633806;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #085041;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --coral-dark: #712B13;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #faf9f7;
+    color: #1a1a1a;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* HOME */
+  #home {
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    gap: 2.5rem;
+  }
+
+  .home-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: #1a1a1a;
+  }
+
+  .home-subtitle {
+    font-size: 0.95rem;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .cat-btn {
+    border: none;
+    border-radius: 16px;
+    padding: 1.1rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .cat-btn:active { transform: scale(0.96); opacity: 0.85; }
+
+  .cat-btn.all {
+    grid-column: 1 / -1;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 1.2rem;
+    border-radius: 16px;
+    letter-spacing: 0.02em;
+  }
+
+  .cat-btn[data-cat="relacionando"] { background: var(--pink-light); color: var(--pink-dark); }
+  .cat-btn[data-cat="papo-furado"] { background: var(--green-light); color: var(--green-dark); }
+  .cat-btn[data-cat="to-be"] { background: var(--purple-light); color: var(--purple-dark); }
+  .cat-btn[data-cat="fanfiqueiros"] { background: var(--amber-light); color: var(--amber-dark); }
+  .cat-btn[data-cat="cultura"] { background: var(--teal-light); color: var(--teal-dark); }
+  .cat-btn[data-cat="pausa"] { background: var(--coral-light); color: var(--coral-dark); }
+
+  /* GAME SCREEN */
+  #game {
+    padding: 0;
+    position: relative;
+  }
+
+  .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.25rem 0.75rem;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0.25rem;
+    line-height: 1;
+  }
+
+  .progress-info {
+    font-size: 0.8rem;
+    color: #aaa;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .cat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 99px;
+  }
+
+  .cat-label[data-cat="relacionando"] { background: var(--pink-light); color: var(--pink-dark); }
+  .cat-label[data-cat="papo-furado"] { background: var(--green-light); color: var(--green-dark); }
+  .cat-label[data-cat="to-be"] { background: var(--purple-light); color: var(--purple-dark); }
+  .cat-label[data-cat="fanfiqueiros"] { background: var(--amber-light); color: var(--amber-dark); }
+  .cat-label[data-cat="cultura"] { background: var(--teal-light); color: var(--teal-dark); }
+  .cat-label[data-cat="pausa"] { background: var(--coral-light); color: var(--coral-dark); }
+  .cat-label[data-cat="all"] { background: #1a1a1a; color: #fff; }
+
+  .card-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1.25rem;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 340px;
+    min-height: 380px;
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid #eee;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1.5rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.25s, transform 0.25s;
+  }
+
+  .card.exit {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+
+  .card.enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .card-option {
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+  }
+
+  .card-or {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .card-or::before,
+  .card-or::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #eee;
+  }
+
+  .or-bubble {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .game-footer {
+    padding: 1rem 1.25rem 2rem;
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 14px;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #1a1a1a;
+    transition: transform 0.12s, background 0.12s;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-btn:active { transform: scale(0.97); background: #f5f5f5; }
+
+  .nav-btn.primary {
+    background: #1a1a1a;
+    color: #fff;
+    border-color: #1a1a1a;
+    flex: 2;
+  }
+
+  .nav-btn.primary:active { background: #333; }
+
+  /* EMPTY */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+    color: #888;
+  }
+
+  .empty-state .big { font-size: 3rem; }
+  .empty-state h2 { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; }
+  .empty-state p { font-size: 0.9rem; line-height: 1.5; }
+
+  .progress-bar {
+    height: 3px;
+    background: #eee;
+    margin: 0 1.25rem;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: #1a1a1a;
+    transition: width 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div>
+    <div class="home-title">Tudo<br>Depende</div>
+    <div class="home-subtitle">da sua opinião</div>
+  </div>
+
+  <div class="categories-grid">
+    <button class="cat-btn all" onclick="startGame('all')">Embaralhar tudo</button>
+    <button class="cat-btn" data-cat="relacionando" onclick="startGame('relacionando')">❤️ Relacionando</button>
+    <button class="cat-btn" data-cat="papo-furado" onclick="startGame('papo-furado')">🤪 Papo Furado</button>
+    <button class="cat-btn" data-cat="to-be" onclick="startGame('to-be')">🤔 To be or Not to Be</button>
+    <button class="cat-btn" data-cat="fanfiqueiros" onclick="startGame('fanfiqueiros')">🎭 Fanfiqueiros</button>
+    <button class="cat-btn" data-cat="cultura" onclick="startGame('cultura')">🎓 Cultura (in)útil</button>
+    <button class="cat-btn" data-cat="pausa" onclick="startGame('pausa')">🌙 Pausa Existencial</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span class="cat-label" id="game-cat-label"></span>
+    <span class="progress-info" id="progress-text"></span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <div class="card-area">
+    <div class="card" id="card">
+      <div class="card-option" id="option-a"></div>
+      <div class="card-or">
+        <div class="or-bubble">ou</div>
+      </div>
+      <div class="card-option" id="option-b"></div>
+    </div>
+  </div>
+  <div class="game-footer">
+    <button class="nav-btn" onclick="prevCard()">← Anterior</button>
+    <button class="nav-btn primary" onclick="nextCard()">Próxima →</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = {
+  relacionando: [
+    ["Você acredita em "pessoa certa, momento errado"", "não existe momento errado para a pessoa certa?"],
+    ["Apagar a memória que seu ex parceiro tem de você", "apagar a sua memória do seu ex parceiro?"],
+    ["Descobrir que o amor da sua vida já passou e você deixou escapar", "nunca saber se ele existiu?"],
+    ["Seu parceiro pudesse ler todos os seus pensamentos", "você pudesse ler todos os pensamentos dele?"],
+    ["Fazer um teste científico de compatibilidade amorosa", "continuar sem saber?"],
+    ["Relacionamento em que nunca falta amor, mas falta desejo", "nunca falta desejo, mas o amor é constantemente questionado?"],
+    ["A paixão diminui, mas a admiração aumenta", "a paixão permanece intensa, mas os conflitos aumentam junto?"],
+    ["Ser a pessoa mais amada da relação", "a que mais ama?"],
+    ["Se relacionar com alguém exatamente igual a você é match perfeito", "pior pesadelo?"],
+    ["Seu parceiro te acompanha nas suas atividades pessoais", "o casal mantém suas individualidades?"],
+    ["Nunca mais viajar", "nunca mais se apaixonar?"],
+    ["Relacionamento com muita paixão e pouca estabilidade", "muita estabilidade e pouca paixão?"],
+    ["Saber de todos os flertes que seu parceiro recebe", "não saber de nenhum?"],
+    ["Casar com cerimônia e festa à moda antiga", "morar junto já é o novo conceito de casar?"],
+    ["É mais difícil lidar com um parceiro com autoestima extremamente baixa", "extremamente alta?"],
+    ["Namorar alguém muito parecido com você", "muito diferente?"],
+    ["Construir uma relação aos poucos", "sentir uma conexão instantânea?"],
+    ["Perdoar uma traição", "terminar sem olhar para trás?"],
+    ["Ter um parceiro que te desafia constantemente", "que sempre concorda com você?"],
+    ["Encontrar o amor da sua vida aos 20 anos", "aos 50?"],
+    ["Encontrar o amor da sua vida e perdê-lo cedo", "nunca encontrá-lo mas viver relações boas?"],
+    ["Receber uma declaração pública de amor", "uma demonstração privada e sincera?"],
+    ["Descobrir que seu parceiro mente para evitar conflitos", "fala a verdade mesmo quando machuca?"],
+    ["Ter uma química absurda mas objetivos incompatíveis", "objetivos compatíveis mas pouca química?"],
+    ["Se apaixonar várias vezes", "uma única vez intensamente?"],
+    ["Namorar alguém muito independente", "alguém que queira compartilhar tudo com você?"],
+    ["Ter um parceiro que te conhece completamente", "alguém que te surpreende constantemente?"],
+    ["Nunca mais sentir ciúmes", "nunca mais causar ciúmes?"],
+    ["O amor é escolha", "sorte?"],
+  ],
+  "papo-furado": [
+    ["Ter filhos amanhã", "nunca ter filhos?"],
+    ["Colocar uma nota de 1 a 5 nas pessoas depois de conhecê-las", "achar isso assustadoramente distópico?"],
+    ["Todas as suas conversas fossem gravadas para sempre", "todas desaparecessem após 24 horas?"],
+    ["Apertar o botão que mostra o que as pessoas pensam de você", "passar a vida sem saber?"],
+    ["Receber R$ 1.000 toda vez que passasse vergonha em público", "nunca mais sentir vergonha de nada?"],
+    ["Ver quantas vezes cada pessoa já pensou em você", "acreditar que algumas curiosidades devem permanecer desconhecidas?"],
+    ["Entrar em um reality show", "não há dinheiro no mundo que compense toda a exposição?"],
+    ["Ter que cantar tudo que fala", "dançar toda vez que escuta música?"],
+    ["Nunca mais comer doce", "nunca mais comer salgado?"],
+    ["Ter Wi-Fi perfeito em qualquer lugar", "ar-condicionado perfeito em qualquer lugar?"],
+    ["Ser extremamente azarado no amor", "extremamente azarado no trabalho?"],
+    ["Falar o que pensa sempre", "nunca conseguir dizer o que pensa?"],
+    ["Viver sem café", "sem refrigerante?"],
+    ["Ter uma trilha sonora na vida", "efeitos especiais?"],
+    ["Ter que usar fantasia todos os dias", "uniforme todos os dias?"],
+    ["Nunca mais ouvir música", "nunca mais assistir filmes?"],
+    ["Poder comer qualquer coisa sem engordar", "precisar dormir só 3 horas por noite?"],
+    ["Ter uma risada muito estranha", "uma voz muito estranha?"],
+    ["Nunca mais usar GPS", "nunca mais usar corretor de texto?"],
+    ["Viver em um eterno verão", "eterno inverno?"],
+    ["Ter que contar uma piada ruim por dia", "ouvir uma piada ruim por dia?"],
+    ["Saber exatamente quanto dinheiro você terá", "exatamente quantos dias de vida restam?"],
+    ["Ser famoso no TikTok", "respeitado no LinkedIn?"],
+    ["Nunca mais trabalhar", "nunca mais envelhecer?"],
+    ["Ser famoso mundialmente", "rico anonimamente?"],
+    ["Viver sem precisar trabalhar", "sem precisar dormir?"],
+    ["Poder ler pensamentos", "prever o futuro?"],
+  ],
+  "to-be": [
+    ["O ser humano tem livre arbítrio", "ele já nasce com fatores pré-determinantes?"],
+    ["Ser a pessoa mais inteligente do mundo", "a mais carismática?"],
+    ["Viver sem saber o que vai acontecer é emocionante", "angustiante?"],
+    ["Ter todas as respostas", "fazer todas as perguntas certas?"],
+    ["Mudar seu passado", "conhecer seu futuro?"],
+    ["Ter mais tempo", "mais energia?"],
+    ["Ser completamente autêntico", "completamente adaptável?"],
+    ["Liberdade total", "segurança total?"],
+    ["É mais perigoso alguém que nunca muda de opinião", "alguém que muda de opinião o tempo todo?"],
+    ["O ser humano nasce bom", "nasce egoísta?"],
+    ["É mais importante viver uma vida coerente com seus valores", "uma vida que produza os melhores resultados possíveis?"],
+    ["As pessoas são responsáveis por quem se tornam", "a maior parte das nossas escolhas é consequência das circunstâncias?"],
+    ["A intenção importa mais", "o resultado importa mais?"],
+    ["Ter razão sozinho", "estar errado junto com todo mundo?"],
+    ["Ser lembrado por suas ideias", "por suas atitudes?"],
+    ["Viver sem arrependimentos", "sem expectativas?"],
+    ["Ser admirado por quem você despreza", "ignorado por quem você admira?"],
+    ["Ter certeza de tudo", "duvidar de tudo?"],
+    ["Ser totalmente sincero", "totalmente diplomático?"],
+    ["Ser feliz sem propósito", "ter propósito sem felicidade?"],
+    ["A vida tem sentido próprio", "cada um inventa o seu?"],
+    ["É mais importante ser interessante", "ser confiável?"],
+    ["Ser compreendido", "admirado?"],
+    ["Ter talento sem disciplina", "disciplina sem talento?"],
+    ["Você prefere ser a pessoa mais inteligente da sala", "a mais querida?"],
+    ["Ter mais coragem", "mais disciplina?"],
+    ["Ser compreendido por todos", "compreendido profundamente por poucos?"],
+    ["Justiça sem compaixão", "compaixão sem justiça?"],
+  ],
+  fanfiqueiros: [
+    ["Esquecer todo mundo que você já conheceu", "ser esquecido por todo mundo que você conhece?"],
+    ["Garantia de ser muito feliz pelo resto da vida, mas nunca descobrir como sua história termina", "conhecer todos os detalhes do seu futuro, mas sem nenhuma garantia de felicidade?"],
+    ["Reviver infinitamente o melhor dia da sua vida", "viver dias novos para sempre, mesmo sabendo que muitos seriam piores?"],
+    ["Trocar metade do tempo que ainda tem de vida por riqueza suficiente para realizar todos os seus sonhos", "não?"],
+    ["Receber a resposta verdadeira sobre o passado", "sobre o futuro?"],
+    ["Ficar eternamente na fase atual da sua vida", "qualquer outra do seu passado?"],
+    ["Saber toda a verdade do mundo", "viver eternamente na ignorância?"],
+    ["Receber R$ 20 milhões hoje", "voltar aos 15 anos com as memórias atuais?"],
+    ["Viver em uma sociedade extremamente justa, mas pouco livre", "extremamente livre, mas pouco justa?"],
+    ["Apagar todas as suas memórias dolorosas", "acreditar que o sofrimento faz parte de quem somos?"],
+    ["Apagar um arrependimento", "reviver um momento feliz?"],
+    ["Viajar para o passado", "para o futuro?"],
+    ["Viver em uma utopia sem liberdade", "em uma sociedade livre e caótica?"],
+    ["Saber todas as respostas do universo", "fazer qualquer pessoa responder qualquer pergunta?"],
+    ["Trocar de corpo com qualquer pessoa por um mês", "ler seus pensamentos por um mês?"],
+    ["Ter um botão para voltar no tempo", "um botão para pausar o tempo?"],
+    ["Poder realizar um sonho seu", "resolver um problema mundial?"],
+  ],
+  cultura: [
+    ["Você bloquearia pessoas da vida real se fosse possível", "acredita que isso seria ultrapassar os limites da realidade?"],
+    ["A inteligência artificial vai ampliar a criatividade humana", "fazer com que ela seja cada vez menos necessária?"],
+    ["Vale mais a pena consumir muitas obras medianas", "poucas obras extraordinárias?"],
+    ["Ver 'reviews' da pessoa antes de se relacionar", "prefere não saber nada?"],
+    ["Um livro que muda sua forma de pensar é necessariamente melhor", "do que um livro que apenas te diverte?"],
+    ["O que motiva mais as pessoas: palavras de incentivo (na base do amor)", "de desprezo (na força do ódio)?"],
+    ["Filme melhor que livro", "livro melhor que filme?"],
+    ["Arte precisa provocar", "confortar?"],
+    ["IA cria arte", "apenas reproduz?"],
+    ["Artista genial e problemático", "artista ético e mediano?"],
+    ["Consumir cultura sozinho", "compartilhar a experiência?"],
+    ["Obras devem ser interpretadas livremente", "conforme a intenção do autor?"],
+    ["Cultura popular", "cultura erudita?"],
+    ["Spoiler estraga a experiência", "não faz diferença?"],
+    ["Arte deve ser entendida", "sentida?"],
+    ["Um artista deve agradar seu público", "desafiar seu público?"],
+    ["A tecnologia aproxima as pessoas", "afasta as pessoas?"],
+    ["Um filme excelente pode compensar um final ruim", "um final ruim arruína tudo?"],
+    ["O sucesso de uma obra depende mais do talento", "da sorte?"],
+    ["Criatividade nasce do talento", "da disciplina?"],
+    ["Vale mais criar algo original", "aperfeiçoar algo existente?"],
+    ["Obras devem envelhecer bem", "representar perfeitamente sua época?"],
+    ["É melhor conhecer profundamente uma área", "superficialmente muitas?"],
+  ],
+  pausa: [
+    ["Ser sempre o centro das atenções", "nunca ser notado em nenhuma situação?"],
+    ["É pior decepcionar os outros", "a si mesmo?"],
+    ["Quem muda mais uma pessoa: os relacionamentos", "o trabalho?"],
+    ["Saber exatamente como as pessoas te enxergam", "exatamente como você realmente é?"],
+    ["Conversar durante uma hora com a versão de você daqui a 30 anos", "com a versão de você de 15 anos atrás?"],
+    ["É mais difícil aceitar que você mudou", "aceitar que nunca mudou tanto quanto imaginava?"],
+    ["Descobrir seu maior talento escondido", "seu maior defeito escondido?"],
+    ["Você teria mais curiosidade de ouvir o que falam de você nas entrevistas", "mais medo?"],
+    ["Ter inteligência", "beleza?"],
+    ["Ser lembrado por quem você foi", "por aquilo que construiu?"],
+    ["Artistas precisam render às pressões da tendência", "artista de verdade não precisa disso?"],
+    ["App de relacionamento é o ápice da superficialidade", "são bons por juntarem pessoas que não se cruzariam na vida real?"],
+    ["Descobrir toda a verdade sobre si mesmo", "manter algumas ilusões?"],
+    ["Viver em paz consigo mesmo", "ser admirado pelos outros?"],
+    ["Seguir a razão", "seguir a intuição?"],
+    ["Aceitar quem você é", "tentar se reinventar?"],
+    ["Receber uma crítica totalmente honesta", "um elogio totalmente sincero?"],
+    ["Ser extraordinário em uma única coisa", "bom em muitas?"],
+    ["Ter mais autoconfiança", "mais autoconsciência?"],
+    ["Saber exatamente o que quer", "saber exatamente quem é?"],
+    ["Viver com menos medo", "com menos arrependimento?"],
+    ["A nostalgia ajuda a viver", "atrapalha a seguir em frente?"],
+    ["Vale mais uma vida intensa", "uma vida tranquila?"],
+    ["Viver uma vida curta e extraordinária", "longa e comum?"],
+    ["Recomeçar sua vida do zero", "continuar exatamente como está?"],
+    ["Viver para colecionar histórias", "estabilidade?"],
+    ["Ter mais autoconfiança", "mais autoconsciência?"],
+    ["Saber exatamente quando vai morrer", "nunca descobrir?"],
+    ["Ter dinheiro para nunca mais se preocupar", "um trabalho que você ama?"],
+    ["Ser feliz sem reconhecimento", "altamente reconhecido sem felicidade?"],
+    ["Ser feliz agora", "garantir felicidade no futuro?"],
+  ],
+};
+
+const CAT_NAMES = {
+  all: "Tudo Depende",
+  relacionando: "❤️ Relacionando",
+  "papo-furado": "🤪 Papo Furado",
+  "to-be": "🤔 To be or Not to Be",
+  fanfiqueiros: "🎭 Fanfiqueiros",
+  cultura: "🎓 Cultura (in)útil",
+  pausa: "🌙 Pausa Existencial",
+};
+
+let deck = [];
+let currentIndex = 0;
+let currentCat = "all";
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame(cat) {
+  currentCat = cat;
+  if (cat === "all") {
+    let all = [];
+    Object.entries(QUESTIONS).forEach(([key, qs]) => {
+      qs.forEach(q => all.push({ q, cat: key }));
+    });
+    deck = shuffle(all);
+  } else {
+    deck = shuffle(QUESTIONS[cat].map(q => ({ q, cat })));
+  }
+  currentIndex = 0;
+  showScreen("game");
+
+  const label = document.getElementById("game-cat-label");
+  label.textContent = CAT_NAMES[cat];
+  label.setAttribute("data-cat", cat === "all" ? "all" : cat);
+
+  renderCard(false);
+}
+
+function renderCard(animate) {
+  const card = document.getElementById("card");
+  const item = deck[currentIndex];
+
+  if (animate) {
+    card.classList.add("exit");
+    setTimeout(() => {
+      updateCardContent(item);
+      card.classList.remove("exit");
+      card.classList.add("enter");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.classList.remove("enter");
+        });
+      });
+    }, 220);
+  } else {
+    updateCardContent(item);
+  }
+
+  const total = deck.length;
+  document.getElementById("progress-text").textContent = `${currentIndex + 1} / ${total}`;
+  document.getElementById("progress-fill").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+  if (currentCat === "all") {
+    const label = document.getElementById("game-cat-label");
+    label.textContent = CAT_NAMES[item.cat];
+    label.setAttribute("data-cat", item.cat);
+  }
+}
+
+function updateCardContent(item) {
+  document.getElementById("option-a").textContent = item.q[0];
+  document.getElementById("option-b").textContent = item.q[1];
+}
+
+function nextCard() {
+  if (currentIndex < deck.length - 1) {
+    currentIndex++;
+    renderCard(true);
+  } else {
+    showEndState();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCard(true);
+  }
+}
+
+function showEndState() {
+  const cardArea = document.querySelector(".card-area");
+  cardArea.innerHTML = `
+    <div class="empty-state">
+      <div class="big">✓</div>
+      <h2>Acabou por aqui!</h2>
+      <p>Vocês passaram por todas as cartas.<br>Querem embaralhar de novo?</p>
+      <button class="nav-btn primary" style="margin-top:1rem; max-width: 200px;" onclick="startGame(currentCat)">Embaralhar de novo</button>
+    </div>
+  `;
+}
+
+function goHome() {
+  showScreen("home");
+  const cardArea = document.querySelector(".card-area");
+  cardArea.innerHTML = `<div class="card" id="card">
+    <div class="card-option" id="option-a"></div>
+    <div class="card-or"><div class="or-bubble">ou</div></div>
+    <div class="card-option" id="option-b"></div>
+  </div>`;
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+</script>
+</body>
+</html>
