@@ -4,311 +4,430 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tudo Depende</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
-    --pink: #D4537E;
-    --pink-light: #FBEAF0;
-    --pink-dark: #72243E;
-    --green: #639922;
-    --green-light: #EAF3DE;
-    --green-dark: #27500A;
-    --purple: #7F77DD;
-    --purple-light: #EEEDFE;
-    --purple-dark: #3C3489;
-    --amber: #BA7517;
-    --amber-light: #FAEEDA;
-    --amber-dark: #633806;
-    --teal: #1D9E75;
-    --teal-light: #E1F5EE;
-    --teal-dark: #085041;
-    --coral: #D85A30;
-    --coral-light: #FAECE7;
-    --coral-dark: #712B13;
-  }
+:root {
+  --bg: #f5f0eb;
+  --text: #1a1a1a;
+  --muted: rgba(0,0,0,0.38);
+  --border: rgba(0,0,0,0.1);
+  --card-bg: rgba(255,255,255,0.88);
+  --transition: 0.55s cubic-bezier(0.4,0,0.2,1);
+}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #faf9f7;
-    color: #1a1a1a;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition);
+}
 
-  /* SCREENS */
-  .screen { display: none; min-height: 100vh; }
-  .screen.active { display: flex; flex-direction: column; }
+body.cat-relacionando { --bg: #f0cdd8; }
+body.cat-papo-furado  { --bg: #c8e6cf; }
+body.cat-to-be        { --bg: #d9d4f5; }
+body.cat-fanfiqueiros  { --bg: #fde3bb; }
+body.cat-cultura      { --bg: #bfe0d8; }
+body.cat-pausa        { --bg: #f5d8cc; }
+body.cat-all          { --bg: #f5f0eb; }
 
-  /* HOME */
-  #home {
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    gap: 2.5rem;
-  }
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
 
-  .home-title {
-    font-size: 2.8rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    color: #1a1a1a;
-  }
+/* ── DECORATIVE BLOBS ── */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+  transition: background var(--transition), opacity var(--transition);
+}
+.blob-1 { width: 280px; height: 280px; top: -80px; right: -60px; background: rgba(0,0,0,0.06); }
+.blob-2 { width: 200px; height: 200px; bottom: 60px; left: -60px; background: rgba(0,0,0,0.05); }
 
-  .home-subtitle {
-    font-size: 0.95rem;
-    color: #888;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 0.5rem;
-  }
+body.cat-relacionando .blob-1 { background: #e8a0b8; opacity: 0.5; }
+body.cat-relacionando .blob-2 { background: #c97090; opacity: 0.35; }
+body.cat-papo-furado  .blob-1 { background: #80c990; opacity: 0.5; }
+body.cat-papo-furado  .blob-2 { background: #50a060; opacity: 0.35; }
+body.cat-to-be        .blob-1 { background: #a090e0; opacity: 0.5; }
+body.cat-to-be        .blob-2 { background: #7060c0; opacity: 0.35; }
+body.cat-fanfiqueiros  .blob-1 { background: #f0b060; opacity: 0.5; }
+body.cat-fanfiqueiros  .blob-2 { background: #d08030; opacity: 0.35; }
+body.cat-cultura      .blob-1 { background: #60c0a8; opacity: 0.5; }
+body.cat-cultura      .blob-2 { background: #309070; opacity: 0.35; }
+body.cat-pausa        .blob-1 { background: #e09880; opacity: 0.5; }
+body.cat-pausa        .blob-2 { background: #c06840; opacity: 0.35; }
 
-  .categories-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    width: 100%;
-    max-width: 380px;
-  }
+/* ── HOME ── */
+#home {
+  padding: 3rem 1.5rem 2.5rem;
+  align-items: center;
+  gap: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
 
-  .cat-btn {
-    border: none;
-    border-radius: 16px;
-    padding: 1.1rem 0.75rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.15s, opacity 0.15s;
-    letter-spacing: 0.01em;
-    line-height: 1.3;
-    text-align: center;
-  }
+#home .home-header,
+#home .categories-wrap {
+  position: relative;
+  z-index: 2;
+}
 
-  .cat-btn:active { transform: scale(0.96); opacity: 0.85; }
+.home-header { text-align: center; }
 
-  .cat-btn.all {
-    grid-column: 1 / -1;
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 0.95rem;
-    padding: 1.2rem;
-    border-radius: 16px;
-    letter-spacing: 0.02em;
-  }
+.home-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
 
-  .cat-btn[data-cat="relacionando"] { background: var(--pink-light); color: var(--pink-dark); }
-  .cat-btn[data-cat="papo-furado"] { background: var(--green-light); color: var(--green-dark); }
-  .cat-btn[data-cat="to-be"] { background: var(--purple-light); color: var(--purple-dark); }
-  .cat-btn[data-cat="fanfiqueiros"] { background: var(--amber-light); color: var(--amber-dark); }
-  .cat-btn[data-cat="cultura"] { background: var(--teal-light); color: var(--teal-dark); }
-  .cat-btn[data-cat="pausa"] { background: var(--coral-light); color: var(--coral-dark); }
+.home-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.2rem;
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
 
-  /* GAME SCREEN */
-  #game {
-    padding: 0;
-    position: relative;
-  }
+.home-subtitle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.9rem;
+}
 
-  .game-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.2rem 1.25rem 0.75rem;
-  }
+.home-divider {
+  width: 32px;
+  height: 2px;
+  background: var(--text);
+  opacity: 0.15;
+  border-radius: 99px;
+  margin: 0 auto;
+  margin-top: 1.5rem;
+}
 
-  .back-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #888;
-    padding: 0.25rem;
-    line-height: 1;
-  }
+/* ── CATEGORY GRID ── */
+.categories-wrap { width: 100%; max-width: 380px; }
 
-  .progress-info {
-    font-size: 0.8rem;
-    color: #aaa;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-  }
+.cat-section-label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
 
-  .cat-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.75rem;
-    border-radius: 99px;
-  }
+.cat-btn-all {
+  width: 100%;
+  background: var(--text);
+  color: #fff;
+  border: none;
+  border-radius: 18px;
+  padding: 1.15rem 1.5rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 0.9rem;
+  transition: opacity 0.15s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
 
-  .cat-label[data-cat="relacionando"] { background: var(--pink-light); color: var(--pink-dark); }
-  .cat-label[data-cat="papo-furado"] { background: var(--green-light); color: var(--green-dark); }
-  .cat-label[data-cat="to-be"] { background: var(--purple-light); color: var(--purple-dark); }
-  .cat-label[data-cat="fanfiqueiros"] { background: var(--amber-light); color: var(--amber-dark); }
-  .cat-label[data-cat="cultura"] { background: var(--teal-light); color: var(--teal-dark); }
-  .cat-label[data-cat="pausa"] { background: var(--coral-light); color: var(--coral-dark); }
-  .cat-label[data-cat="all"] { background: #1a1a1a; color: #fff; }
+.cat-btn-all:active { transform: scale(0.97); opacity: 0.85; }
 
-  .card-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 1.25rem;
-    perspective: 1000px;
-  }
+.categories-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
 
-  .card {
-    width: 100%;
-    max-width: 340px;
-    min-height: 380px;
-    background: #fff;
-    border-radius: 24px;
-    border: 1px solid #eee;
-    padding: 2.5rem 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 1.5rem;
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.25s, transform 0.25s;
-  }
+.cat-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 1rem 0.85rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+  text-align: center;
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
 
-  .card.exit {
-    opacity: 0;
-    transform: translateY(-16px);
-  }
+.cat-btn:active { transform: scale(0.95); opacity: 0.8; }
 
-  .card.enter {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+.cat-btn .cat-emoji { font-size: 1.4rem; }
+.cat-btn .cat-name { font-size: 0.75rem; font-weight: 600; }
 
-  .card-option {
-    font-size: 1.35rem;
-    font-weight: 600;
-    line-height: 1.3;
-    color: #1a1a1a;
-    letter-spacing: -0.02em;
-  }
+.cat-btn[data-cat="relacionando"] { background: #fce8ef; color: #7a2040; }
+.cat-btn[data-cat="papo-furado"]  { background: #dff0e3; color: #1a5c30; }
+.cat-btn[data-cat="to-be"]        { background: #e8e4f8; color: #3a2f8f; }
+.cat-btn[data-cat="fanfiqueiros"]  { background: #fef0d8; color: #7a4800; }
+.cat-btn[data-cat="cultura"]      { background: #d8eeea; color: #0a5040; }
+.cat-btn[data-cat="pausa"]        { background: #fde8e0; color: #7a2e10; }
 
-  .card-or {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-  }
+/* ── GAME ── */
+#game { position: relative; z-index: 1; }
 
-  .card-or::before,
-  .card-or::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #eee;
-  }
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 0;
+}
 
-  .or-bubble {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0.02em;
-    flex-shrink: 0;
-  }
+.back-btn {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+  width: 38px; height: 38px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: background 0.15s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.85); }
 
-  .game-footer {
-    padding: 1rem 1.25rem 2rem;
-    display: flex;
-    gap: 0.75rem;
-  }
+.game-cat-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.9rem;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.6);
+  color: var(--text);
+  border: 1px solid rgba(0,0,0,0.1);
+  backdrop-filter: blur(8px);
+}
 
-  .nav-btn {
-    flex: 1;
-    padding: 1rem;
-    border-radius: 14px;
-    border: 1px solid #e5e5e5;
-    background: #fff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: #1a1a1a;
-    transition: transform 0.12s, background 0.12s;
-    letter-spacing: 0.01em;
-  }
+.progress-info {
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--muted);
+  min-width: 40px;
+  text-align: right;
+}
 
-  .nav-btn:active { transform: scale(0.97); background: #f5f5f5; }
+.progress-bar {
+  height: 2px;
+  background: rgba(0,0,0,0.08);
+  margin: 1rem 1.5rem 0;
+  border-radius: 99px;
+  overflow: hidden;
+}
 
-  .nav-btn.primary {
-    background: #1a1a1a;
-    color: #fff;
-    border-color: #1a1a1a;
-    flex: 2;
-  }
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--text);
+  transition: width 0.4s ease;
+}
 
-  .nav-btn.primary:active { background: #333; }
+.card-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
 
-  /* EMPTY */
-  .empty-state {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 2rem;
-    text-align: center;
-    color: #888;
-  }
+.card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--card-bg);
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.9);
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 48px rgba(0,0,0,0.07);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
 
-  .empty-state .big { font-size: 3rem; }
-  .empty-state h2 { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; }
-  .empty-state p { font-size: 0.9rem; line-height: 1.5; }
+.card.exit { opacity: 0; transform: translateY(-14px) scale(0.97); }
+.card.enter { opacity: 0; transform: translateY(16px) scale(0.97); }
 
-  .progress-bar {
-    height: 3px;
-    background: #eee;
-    margin: 0 1.25rem;
-    border-radius: 99px;
-    overflow: hidden;
-  }
+.card-option {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  text-align: center;
+}
 
-  .progress-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: #1a1a1a;
-    transition: width 0.3s ease;
-  }
+/* ── HOME DECORATIVE ELEMENTS ── */
+.home-deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  color: var(--text);
+  opacity: 0.055;
+  user-select: none;
+  transition: opacity var(--transition);
+}
+.home-deco.d1  { top: 5%;  left: 7%;   font-size: 2rem;   opacity: 0.07; }
+.home-deco.d2  { top: 11%; right: 9%;  font-size: 1.2rem; opacity: 0.045; }
+.home-deco.d3  { top: 30%; left: 4%;   font-size: 1rem;   opacity: 0.04; }
+.home-deco.d4  { top: 20%; right: 5%;  font-size: 1.8rem; opacity: 0.055; }
+.home-deco.d5  { bottom: 30%; left: 6%;  font-size: 1.4rem; opacity: 0.05; }
+.home-deco.d6  { bottom: 18%; right: 7%; font-size: 1rem;   opacity: 0.04; }
+.home-deco.d7  { bottom: 9%;  left: 13%; font-size: 1.6rem; opacity: 0.055; }
+
+.card-or {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.card-or::before, .card-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+}
+
+.or-bubble {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-style: italic;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.game-footer {
+  padding: 0 1.5rem 2.5rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.13);
+  background: rgba(255,255,255,0.55);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text);
+  transition: transform 0.12s, background 0.12s;
+  backdrop-filter: blur(8px);
+}
+
+.nav-btn:active { transform: scale(0.97); }
+.nav-btn:hover { background: rgba(255,255,255,0.82); }
+
+.nav-btn.primary {
+  background: var(--text);
+  color: #fff;
+  border-color: transparent;
+  flex: 2;
+}
+.nav-btn.primary:hover { opacity: 0.88; background: var(--text); }
+
+.empty-state {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0.85rem; padding: 2rem; text-align: center;
+}
+
+.empty-icon {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem; font-weight: 900;
+  color: var(--muted); line-height: 1;
+}
+
+.empty-state h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700; color: var(--text);
+}
+
+.empty-state p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
 </style>
 </head>
-<body>
+<body class="cat-all">
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
 
 <!-- HOME -->
 <div id="home" class="screen active">
-  <div>
+  <div class="home-header">
+    <div class="home-tag">Jogo de perguntas</div>
     <div class="home-title">Tudo<br>Depende</div>
     <div class="home-subtitle">da sua opinião</div>
+    <div class="home-divider"></div>
   </div>
 
-  <div class="categories-grid">
-    <button class="cat-btn all" onclick="startGame('all')">Embaralhar tudo</button>
-    <button class="cat-btn" data-cat="relacionando" onclick="startGame('relacionando')">❤️ Relacionando</button>
-    <button class="cat-btn" data-cat="papo-furado" onclick="startGame('papo-furado')">🤪 Papo Furado</button>
-    <button class="cat-btn" data-cat="to-be" onclick="startGame('to-be')">🤔 To be or Not to Be</button>
-    <button class="cat-btn" data-cat="fanfiqueiros" onclick="startGame('fanfiqueiros')">🎭 Fanfiqueiros</button>
-    <button class="cat-btn" data-cat="cultura" onclick="startGame('cultura')">🎓 Cultura (in)útil</button>
-    <button class="cat-btn" data-cat="pausa" onclick="startGame('pausa')">🌙 Pausa Existencial</button>
+  <div class="categories-wrap">
+    <div class="cat-section-label">Escolha uma categoria</div>
+    <button class="cat-btn-all" onclick="startGame('all')">
+      Embaralhar tudo ✦
+    </button>
+    <div class="categories-grid">
+      <button class="cat-btn" data-cat="relacionando" onclick="startGame('relacionando')">
+        <span class="cat-emoji">❤️</span>
+        <span class="cat-name">Relacionando</span>
+      </button>
+      <button class="cat-btn" data-cat="papo-furado" onclick="startGame('papo-furado')">
+        <span class="cat-emoji">🤪</span>
+        <span class="cat-name">Papo Furado</span>
+      </button>
+      <button class="cat-btn" data-cat="to-be" onclick="startGame('to-be')">
+        <span class="cat-emoji">🤔</span>
+        <span class="cat-name">To be or Not to Be</span>
+      </button>
+      <button class="cat-btn" data-cat="fanfiqueiros" onclick="startGame('fanfiqueiros')">
+        <span class="cat-emoji">🎭</span>
+        <span class="cat-name">Fanfiqueiros</span>
+      </button>
+      <button class="cat-btn" data-cat="cultura" onclick="startGame('cultura')">
+        <span class="cat-emoji">🎓</span>
+        <span class="cat-name">Cultura (in)útil</span>
+      </button>
+      <button class="cat-btn" data-cat="pausa" onclick="startGame('pausa')">
+        <span class="cat-emoji">🌙</span>
+        <span class="cat-name">Pausa Existencial</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -316,7 +435,7 @@
 <div id="game" class="screen">
   <div class="game-header">
     <button class="back-btn" onclick="goHome()">←</button>
-    <span class="cat-label" id="game-cat-label"></span>
+    <div class="game-cat-pill" id="game-cat-label"></div>
     <span class="progress-info" id="progress-text"></span>
   </div>
   <div class="progress-bar">
@@ -325,9 +444,7 @@
   <div class="card-area">
     <div class="card" id="card">
       <div class="card-option" id="option-a"></div>
-      <div class="card-or">
-        <div class="or-bubble">ou</div>
-      </div>
+      <div class="card-or"><div class="or-bubble">ou</div></div>
       <div class="card-option" id="option-b"></div>
     </div>
   </div>
@@ -368,7 +485,7 @@ const QUESTIONS = {
     ["Namorar alguém muito independente", "alguém que queira compartilhar tudo com você?"],
     ["Ter um parceiro que te conhece completamente", "alguém que te surpreende constantemente?"],
     ["Nunca mais sentir ciúmes", "nunca mais causar ciúmes?"],
-    ["O amor é escolha", "sorte?"],
+    ["O amor é escolha", "sorte?"]
   ],
   "papo-furado": [
     ["Ter filhos amanhã", "nunca ter filhos?"],
@@ -397,7 +514,7 @@ const QUESTIONS = {
     ["Nunca mais trabalhar", "nunca mais envelhecer?"],
     ["Ser famoso mundialmente", "rico anonimamente?"],
     ["Viver sem precisar trabalhar", "sem precisar dormir?"],
-    ["Poder ler pensamentos", "prever o futuro?"],
+    ["Poder ler pensamentos", "prever o futuro?"]
   ],
   "to-be": [
     ["O ser humano tem livre arbítrio", "ele já nasce com fatores pré-determinantes?"],
@@ -427,7 +544,7 @@ const QUESTIONS = {
     ["Você prefere ser a pessoa mais inteligente da sala", "a mais querida?"],
     ["Ter mais coragem", "mais disciplina?"],
     ["Ser compreendido por todos", "compreendido profundamente por poucos?"],
-    ["Justiça sem compaixão", "compaixão sem justiça?"],
+    ["Justiça sem compaixão", "compaixão sem justiça?"]
   ],
   fanfiqueiros: [
     ["Esquecer todo mundo que você já conheceu", "ser esquecido por todo mundo que você conhece?"],
@@ -446,13 +563,13 @@ const QUESTIONS = {
     ["Saber todas as respostas do universo", "fazer qualquer pessoa responder qualquer pergunta?"],
     ["Trocar de corpo com qualquer pessoa por um mês", "ler seus pensamentos por um mês?"],
     ["Ter um botão para voltar no tempo", "um botão para pausar o tempo?"],
-    ["Poder realizar um sonho seu", "resolver um problema mundial?"],
+    ["Poder realizar um sonho seu", "resolver um problema mundial?"]
   ],
   cultura: [
     ["Você bloquearia pessoas da vida real se fosse possível", "acredita que isso seria ultrapassar os limites da realidade?"],
     ["A inteligência artificial vai ampliar a criatividade humana", "fazer com que ela seja cada vez menos necessária?"],
     ["Vale mais a pena consumir muitas obras medianas", "poucas obras extraordinárias?"],
-    ["Ver 'reviews' da pessoa antes de se relacionar", "prefere não saber nada?"],
+    ["Ver reviews da pessoa antes de se relacionar", "prefere não saber nada?"],
     ["Um livro que muda sua forma de pensar é necessariamente melhor", "do que um livro que apenas te diverte?"],
     ["O que motiva mais as pessoas: palavras de incentivo (na base do amor)", "de desprezo (na força do ódio)?"],
     ["Filme melhor que livro", "livro melhor que filme?"],
@@ -471,7 +588,7 @@ const QUESTIONS = {
     ["Criatividade nasce do talento", "da disciplina?"],
     ["Vale mais criar algo original", "aperfeiçoar algo existente?"],
     ["Obras devem envelhecer bem", "representar perfeitamente sua época?"],
-    ["É melhor conhecer profundamente uma área", "superficialmente muitas?"],
+    ["É melhor conhecer profundamente uma área", "superficialmente muitas?"]
   ],
   pausa: [
     ["Ser sempre o centro das atenções", "nunca ser notado em nenhuma situação?"],
@@ -500,12 +617,11 @@ const QUESTIONS = {
     ["Viver uma vida curta e extraordinária", "longa e comum?"],
     ["Recomeçar sua vida do zero", "continuar exatamente como está?"],
     ["Viver para colecionar histórias", "estabilidade?"],
-    ["Ter mais autoconfiança", "mais autoconsciência?"],
     ["Saber exatamente quando vai morrer", "nunca descobrir?"],
     ["Ter dinheiro para nunca mais se preocupar", "um trabalho que você ama?"],
     ["Ser feliz sem reconhecimento", "altamente reconhecido sem felicidade?"],
-    ["Ser feliz agora", "garantir felicidade no futuro?"],
-  ],
+    ["Ser feliz agora", "garantir felicidade no futuro?"]
+  ]
 };
 
 const CAT_NAMES = {
@@ -515,12 +631,10 @@ const CAT_NAMES = {
   "to-be": "🤔 To be or Not to Be",
   fanfiqueiros: "🎭 Fanfiqueiros",
   cultura: "🎓 Cultura (in)útil",
-  pausa: "🌙 Pausa Existencial",
+  pausa: "🌙 Pausa Existencial"
 };
 
-let deck = [];
-let currentIndex = 0;
-let currentCat = "all";
+let deck = [], currentIndex = 0, currentCat = "all";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -531,55 +645,51 @@ function shuffle(arr) {
   return a;
 }
 
+function setBgClass(cat) {
+  document.body.className = "cat-" + (cat === "all" ? "all" : cat);
+}
+
 function startGame(cat) {
   currentCat = cat;
   if (cat === "all") {
     let all = [];
-    Object.entries(QUESTIONS).forEach(([key, qs]) => {
-      qs.forEach(q => all.push({ q, cat: key }));
+    Object.entries(QUESTIONS).forEach(function(entry) {
+      entry[1].forEach(function(q) { all.push({ q: q, cat: entry[0] }); });
     });
     deck = shuffle(all);
   } else {
-    deck = shuffle(QUESTIONS[cat].map(q => ({ q, cat })));
+    deck = shuffle(QUESTIONS[cat].map(function(q) { return { q: q, cat: cat }; }));
   }
   currentIndex = 0;
+  setBgClass(cat);
   showScreen("game");
-
-  const label = document.getElementById("game-cat-label");
-  label.textContent = CAT_NAMES[cat];
-  label.setAttribute("data-cat", cat === "all" ? "all" : cat);
-
+  document.getElementById("game-cat-label").textContent = CAT_NAMES[cat];
   renderCard(false);
 }
 
 function renderCard(animate) {
-  const card = document.getElementById("card");
   const item = deck[currentIndex];
+  if (currentCat === "all") {
+    setBgClass(item.cat);
+    document.getElementById("game-cat-label").textContent = CAT_NAMES[item.cat];
+  }
+  const total = deck.length;
+  document.getElementById("progress-text").textContent = (currentIndex + 1) + " / " + total;
+  document.getElementById("progress-fill").style.width = (((currentIndex + 1) / total) * 100) + "%";
 
+  const card = document.getElementById("card");
   if (animate) {
     card.classList.add("exit");
-    setTimeout(() => {
+    setTimeout(function() {
       updateCardContent(item);
       card.classList.remove("exit");
       card.classList.add("enter");
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          card.classList.remove("enter");
-        });
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() { card.classList.remove("enter"); });
       });
-    }, 220);
+    }, 200);
   } else {
     updateCardContent(item);
-  }
-
-  const total = deck.length;
-  document.getElementById("progress-text").textContent = `${currentIndex + 1} / ${total}`;
-  document.getElementById("progress-fill").style.width = `${((currentIndex + 1) / total) * 100}%`;
-
-  if (currentCat === "all") {
-    const label = document.getElementById("game-cat-label");
-    label.textContent = CAT_NAMES[item.cat];
-    label.setAttribute("data-cat", item.cat);
   }
 }
 
@@ -605,29 +715,30 @@ function prevCard() {
 }
 
 function showEndState() {
-  const cardArea = document.querySelector(".card-area");
-  cardArea.innerHTML = `
-    <div class="empty-state">
-      <div class="big">✓</div>
-      <h2>Acabou por aqui!</h2>
-      <p>Vocês passaram por todas as cartas.<br>Querem embaralhar de novo?</p>
-      <button class="nav-btn primary" style="margin-top:1rem; max-width: 200px;" onclick="startGame(currentCat)">Embaralhar de novo</button>
-    </div>
-  `;
+  document.querySelector(".card-area").innerHTML =
+    '<div class="empty-state">' +
+    '<div class="empty-icon">fim.</div>' +
+    '<h2>Acabou por aqui!</h2>' +
+    '<p>Vocês passaram por todas as cartas.<br>Querem embaralhar de novo?</p>' +
+    '<button class="nav-btn primary" style="margin-top:1.5rem;max-width:220px" onclick="startGame(currentCat)">Embaralhar de novo</button>' +
+    '</div>';
+  document.querySelector(".game-footer").style.display = "none";
 }
 
 function goHome() {
+  setBgClass("all");
   showScreen("home");
-  const cardArea = document.querySelector(".card-area");
-  cardArea.innerHTML = `<div class="card" id="card">
-    <div class="card-option" id="option-a"></div>
-    <div class="card-or"><div class="or-bubble">ou</div></div>
-    <div class="card-option" id="option-b"></div>
-  </div>`;
+  document.querySelector(".game-footer").style.display = "";
+  document.querySelector(".card-area").innerHTML =
+    '<div class="card" id="card">' +
+    '<div class="card-option" id="option-a"></div>' +
+    '<div class="card-or"><div class="or-bubble">ou</div></div>' +
+    '<div class="card-option" id="option-b"></div>' +
+    '</div>';
 }
 
 function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".screen").forEach(function(s) { s.classList.remove("active"); });
   document.getElementById(id).classList.add("active");
 }
 </script>
